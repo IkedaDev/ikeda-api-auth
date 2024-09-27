@@ -1,12 +1,13 @@
-import { LoginRequestDto, RefreshRequestDto } from "../../domain/dtos";
-import { LoginUser } from "../../domain/entities";
+import { LoginRequestDto, RefreshRequestDto, RegisterRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
+import { LoginUser, InvalidTokenStatus, ValidTokenStatus } from "../../domain/entities";
 import { AuthRepository } from "../../domain/repository";
 import { CustomError } from '../../../core/models';
-import { KeycloakConnectionProps, KeycloakResponse } from "./interfaces";
+import { KeycloakConnectionProps, KeycloakLoginResponse } from "./interfaces";
 import { KeycloakConnection } from "./connection/keycloak-connection.infrastructure";
+import { KeycloakResponsesAdapter } from "./adapters";
 
 export class KeycloakAuth extends KeycloakConnection implements AuthRepository {
-    
+
     constructor(props: KeycloakConnectionProps){
         super(props);
     }
@@ -19,8 +20,8 @@ export class KeycloakAuth extends KeycloakConnection implements AuthRepository {
                 'password': loginRequestDto.password,
             });
 
-            const data = await this.fetchToken(params);
-            return this.createLoginUser(data);
+            const data = await this.token(params);
+            return KeycloakResponsesAdapter.toLoginUser(data);
         
         } catch (error) {
             console.error(error);
@@ -35,8 +36,8 @@ export class KeycloakAuth extends KeycloakConnection implements AuthRepository {
                 'refresh_token': refreshDto.refreshToken,
             });
 
-            const data = await this.fetchToken(params);
-            return this.createLoginUser(data);
+            const data = await this.token(params);
+            return KeycloakResponsesAdapter.toLoginUser(data);
         
         } catch (error) {
             console.error(error);
@@ -44,13 +45,28 @@ export class KeycloakAuth extends KeycloakConnection implements AuthRepository {
         }
     }
 
-    private createLoginUser(data: KeycloakResponse): LoginUser {
-        return new LoginUser({
-            expiresIn: data.expires_in,
-            refreshToken: data.refresh_token,
-            accessToken: data.access_token,
-            tokenType: data.token_type,
-        });
+    async verifyToken(verifyTokenDto: VerifyTokenRequestDto): Promise<ValidTokenStatus | InvalidTokenStatus> {
+        try {           
+            const params = new URLSearchParams({
+                'token': verifyTokenDto.accessToken,
+            });
+            const data = await this.introspect(params);
+
+            if( !data.active ) return KeycloakResponsesAdapter.toInValidTokenStatus(data)
+                
+            return KeycloakResponsesAdapter.toValidTokenStatus(data)
+        
+        } catch (error) {
+            console.error(error);
+            throw CustomError.unauthorized('No se pudo verificar el token.')
+        }
+    }
+
+    register(registerDto: RegisterRequestDto): Promise<LoginUser> {
+
+        console.log(registerDto)
+
+        throw new Error("Method not implemented.");
     }
     
 }

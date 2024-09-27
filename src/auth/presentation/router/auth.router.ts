@@ -3,6 +3,7 @@ import { AuthController } from '../controller/auth.controller'
 import { check } from 'express-validator'
 import { validateFields } from '../../../core/server/express/middlewares'
 import { KeycloakAuth } from '../../infrastructure'
+import { Envs } from '../../../core/adapters/env'
 
 export class AuthRouter {
 
@@ -10,10 +11,10 @@ export class AuthRouter {
         const router = Router()
 
         const keycloak = new KeycloakAuth({
-            url: 'http://localhost:8080',
-            realm:'ikedadev',
-            clientId: 'ikeda-api-auth',
-            clientSecret: 'kvMisqbAO3hAtShhcHgcWfyT0REICsfB'
+            url: Envs.KEYCLOAK_URL,
+            realm: Envs.KEYCLOAK_REALM,
+            clientId: Envs.KEYCLOAK_CLIENTID,
+            clientSecret: Envs.KEYCLOAK_CLIENTSECRET,
         })
 
         const controller = new AuthController(keycloak)
@@ -23,16 +24,36 @@ export class AuthRouter {
             check('username','El username debe ser un string').isString(),
             check('password','El password es obligatorio').not().isEmpty(),
             check('password','La contraseña debe tener minimo 6 caracteres').isLength({min:6}),
-            validateFields
-        ],  ( req:Request, res:Response ) => controller.login(req, res) )
+            validateFields,
+        ],  ( req: Request, res: Response ) => controller.login(req, res) )
 
         router.post('/refresh',[
             check('refresh_token','El refresh_token es obligatorio').not().isEmpty(),
             check('refresh_token','El refresh_token debe ser un string').isString(),
             check('refresh_token','El refresh_token debe ser un JWT').isJWT(),
-            validateFields
-        ],   ( req:Request, res:Response ) => controller.refresh(req, res) )
+            validateFields,
+        ],   ( req: Request, res: Response ) => controller.refresh(req, res) )
         
+        router.post('/register',[
+            check('username','El username es obligatorio').not().isEmpty(),
+            check('username','El username debe ser un string').isString(),
+            check('username','El username debe tener minimo 4 caracteres').isLength({min:4}),
+            check('email','El email es obligatorio').not().isEmpty(),
+            check('email','El email debe ser un email valido').isEmail(),
+            check('password','El password es obligatorio').not().isEmpty(),
+            check('password','La contraseña debe tener minimo 6 caracteres').isLength({min:6}),
+            validateFields,
+        ],   ( req: Request, res: Response ) => controller.register(req, res) )
+
+        //! Debo hacer antes el verify, y el userinfo
+
+        router.post('/verify',[
+            check('Authorization','El token de authorization es obligatorio').not().isEmpty(),
+            check('Authorization','El token de authorization debe ser un string').isString(),
+            check('Authorization','El token de authorization debe ser un string').matches(/^Bearer\s[0-9a-zA-Z\-_]+\.[0-9a-zA-Z\-_]+\.[0-9a-zA-Z\-_]+$/),
+            validateFields,
+        ],   ( req: Request, res: Response ) => controller.verify(req, res) )
+
         router.post('/logout',  controller.logout )
 
         return router
