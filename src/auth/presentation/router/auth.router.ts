@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { AuthController } from '../controller/auth.controller'
 import { check } from 'express-validator'
 import { validateFields } from '../../../core/server/express/middlewares'
@@ -24,11 +24,16 @@ export class AuthRouter {
             check('password','El password es obligatorio').not().isEmpty(),
             check('password','La contraseña debe tener minimo 6 caracteres').isLength({min:6}),
             validateFields
-        ],  controller.login )
+        ],  ( req:Request, res:Response ) => controller.login(req, res) )
 
+        router.post('/refresh',[
+            check('refresh_token','El refresh_token es obligatorio').not().isEmpty(),
+            check('refresh_token','El refresh_token debe ser un string').isString(),
+            check('refresh_token','El refresh_token debe ser un JWT').isJWT(),
+            validateFields
+        ],   ( req:Request, res:Response ) => controller.refresh(req, res) )
         
         router.post('/logout',  controller.logout )
-        router.post('/refresh',  controller.refresh )
 
         return router
     }

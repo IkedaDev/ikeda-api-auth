@@ -1,12 +1,12 @@
 
-interface Props{
+interface Props {
     accessToken: string
     refreshToken: string
     expiresIn: number
     tokenType:string
 }
 
-export class LoginResponseDto {
+export class RefreshResponseDto {
 
     private readonly access_token: string
     private readonly refresh_token: string

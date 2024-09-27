@@ -1,8 +1,8 @@
 import { LoginRequestDto, LoginResponseDto } from "../domain/dtos";
-import { AuthRepository } from "../domain/repository/auth.repository";
-import { LoginUseCase } from "../domain/use-cases/login.use-case";
+import { AuthRepository } from "../domain/repository";
+import { UserLoginUseCase } from "../domain/use-cases";
 
-export class Login implements LoginUseCase{
+export class UserLogin implements UserLoginUseCase{
 
     constructor(
         private readonly authRepository: AuthRepository
