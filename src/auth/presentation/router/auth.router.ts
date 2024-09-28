@@ -4,6 +4,7 @@ import { check } from 'express-validator'
 import { validateFields } from '../../../core/server/express/middlewares'
 import { KeycloakAuth } from '../../infrastructure'
 import { Envs } from '../../../core/adapters/env'
+import { validateAccessToken } from '../middlewares'
 
 export class AuthRouter {
 
@@ -54,7 +55,25 @@ export class AuthRouter {
             validateFields,
         ],   ( req: Request, res: Response ) => controller.verify(req, res) )
 
-        router.post('/logout',  controller.logout )
+        router.post('/user-info',[
+            check('Authorization','El token de authorization es obligatorio').not().isEmpty(),
+            check('Authorization','El token de authorization debe ser un string').isString(),
+            check('Authorization','El token de authorization debe ser un string').matches(/^Bearer\s[0-9a-zA-Z\-_]+\.[0-9a-zA-Z\-_]+\.[0-9a-zA-Z\-_]+$/),
+            validateAccessToken(keycloak),
+            validateFields,
+        ],   ( req: Request, res: Response ) => controller.userInfo(req, res) )
+
+        router.post('/logout',[
+            check('Authorization','El token de authorization es obligatorio').not().isEmpty(),
+            check('Authorization','El token de authorization debe ser un string').isString(),
+            check('Authorization','El token de authorization debe ser un string').matches(/^Bearer\s[0-9a-zA-Z\-_]+\.[0-9a-zA-Z\-_]+\.[0-9a-zA-Z\-_]+$/),
+            check('refresh_token','El refresh_token debe ser un string').isString(),
+            check('refresh_token','El refresh_token debe ser un JWT').isJWT(),
+            check('redirect_url','Se debe mandar una url de redireccion').not().isEmpty(),
+            check('redirect_url','Se debe mandar una url valida').isURL(),
+            validateAccessToken(keycloak),
+            validateFields,
+        ],  ( req: Request, res: Response ) => controller.logout(req, res) )
 
         return router
     }

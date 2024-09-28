@@ -1,4 +1,4 @@
-import { LoginRequestDto, LoginResponseDto, RefreshRequestDto, RefreshResponseDto } from "../domain/dtos";
+import { RefreshRequestDto, RefreshResponseDto } from "../domain/dtos";
 import { AuthRepository } from "../domain/repository";
 import { RefreshTokenUseCase } from "../domain/use-cases";
 

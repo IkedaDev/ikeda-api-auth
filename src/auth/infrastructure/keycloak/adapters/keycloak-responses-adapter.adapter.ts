@@ -1,10 +1,10 @@
-import { InvalidTokenStatus, LoginUser, ValidTokenStatus } from "../../../domain/entities";
-import { KeycloakIntrospectInvalidResponse, KeycloakIntrospectValidResponse, KeycloakLoginResponse } from "../interfaces";
+import { InvalidTokenStatus, LoginUser, UserInfo, ValidTokenStatus } from "../../../domain/entities";
+import * as KeycloakInterfaces from "../interfaces";
 
 
 export class KeycloakResponsesAdapter {
     
-    static toLoginUser(data: KeycloakLoginResponse): LoginUser {
+    static toLoginUser(data: KeycloakInterfaces.KeycloakLoginResponse): LoginUser {
         return new LoginUser({
             expiresIn: data.expires_in,
             refreshToken: data.refresh_token,
@@ -13,7 +13,7 @@ export class KeycloakResponsesAdapter {
         });
     }
 
-    static toValidTokenStatus(data: KeycloakIntrospectValidResponse): ValidTokenStatus{
+    static toValidTokenStatus(data: KeycloakInterfaces.KeycloakIntrospectValidResponse): ValidTokenStatus{
         return new ValidTokenStatus({
             "allowed-origins": data["allowed-origins"],
             acr: data.acr,
@@ -42,9 +42,23 @@ export class KeycloakResponsesAdapter {
         })
     }
 
-    static toInValidTokenStatus(data: KeycloakIntrospectInvalidResponse): InvalidTokenStatus{
+    static toInValidTokenStatus(data: KeycloakInterfaces.KeycloakIntrospectInvalidResponse): InvalidTokenStatus{
         return new InvalidTokenStatus({
             status: data.active
+        })
+    }
+
+    static toUserInfo(userInfo: KeycloakInterfaces.KeycloakUserInfoResponse): UserInfo {
+        return new UserInfo({
+            email: {
+                email: userInfo.email,
+                verified: userInfo.email_verified
+            },
+            familyName: userInfo.family_name,
+            givenName: userInfo.given_name,
+            name: userInfo.name,
+            preferredUsername: userInfo.preferred_username,
+            sub: userInfo.sub
         })
     }
 }

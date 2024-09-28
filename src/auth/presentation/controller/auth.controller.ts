@@ -33,7 +33,7 @@ export class AuthController extends Controller{
             res.status(200).json({
                 status: true,
                 response
-            })
+            } as ServerResponse<Dto.RefreshResponseDto>)
         })
         .catch( (error) => this.handleError(error, res) )
     }
@@ -42,6 +42,19 @@ export class AuthController extends Controller{
         const access_token = req.headers['authorization'] as string 
         const verifyDto = new Dto.VerifyTokenRequestDto({access_token: access_token.split(' ')[1]})
         new UseCase.VerifyToken(this.authRepository).execute(verifyDto)
+        .then((response) => {
+            res.status(200).json({
+                status: true,
+                response
+            } as ServerResponse<Dto.VerifyTokenResponseDto>)
+        })
+        .catch( (error) => this.handleError(error, res) )
+    }
+
+    userInfo(req: Request, res: Response){
+        const access_token = req.headers['authorization'] as string 
+        const userInfoDto = new Dto.UserInfoRequestDto({access_token: access_token.split(' ')[1]})
+        new UseCase.GetUserInfo(this.authRepository).execute(userInfoDto)
         .then((response) => {
             res.status(200).json({
                 status: true,
@@ -63,8 +76,21 @@ export class AuthController extends Controller{
         .catch( (error) => this.handleError(error, res) )
     }
 
-    logout = (req: Request, res: Response) => {
-        res.json('logout')
+    logout(req: Request, res: Response){
+        const access_token = req.headers['authorization'] as string 
+        const logoutDto = new Dto.LogoutRequestDto({
+            access_token: access_token.split(' ')[1], 
+            refresh_token: req.body.refresh_token,
+            redirect_url: req.body.redirect_url
+        })
+        new UseCase.UserLogout(this.authRepository).execute(logoutDto)
+        .then((response) => {
+            res.status(200).json({
+                status: true,
+                response
+            })
+        })
+        .catch( (error) => this.handleError(error, res) )
     }
 
     
