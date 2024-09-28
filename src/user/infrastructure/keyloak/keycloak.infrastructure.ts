@@ -32,10 +32,14 @@ export class KeycloakUser implements UserRepository {
                     })
                     .fetch()
             const userInfo = await resp.json()
+            if(userInfo.error) throw CustomError.badRequest('No se pudo obtener la informacion del usuario')
             return KeycloakResponsesAdapter.toUserInfo(userInfo)
         } catch (error) {
             console.error(error);
-            throw CustomError.unauthorized('No se pudo obtener la informacion del usuario')
+            if(error instanceof CustomError){
+                throw error
+            }
+            throw CustomError.internalServer()
         }
     }
 

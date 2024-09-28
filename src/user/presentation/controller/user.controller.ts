@@ -1,6 +1,6 @@
 import { Response, Request } from 'express'
 
-import { Controller } from './controller';
+import { Controller } from '../../../core/server/express/controller';
 import * as Dto from '../../domain/dtos';
 import { UserRepository } from '../../domain/repository';
 import * as UseCase from '../../use-cases';

@@ -36,11 +36,15 @@ export class KeycloakAuth implements AuthRepository {
                     .setPath(`/realms/${this._realm}/protocol/openid-connect/token`)
                     .fetch()
             const data = await resp.json()
+            if(data.error) throw CustomError.badRequest('Usuario y/o contraseña invalidos')
             return KeycloakResponsesAdapter.toLoginUser(data);
         
         } catch (error) {
             console.error(error);
-            throw CustomError.unauthorized('No se pudo autenticar el usuario.')
+            if(error instanceof CustomError){
+                throw error
+            }
+            throw CustomError.internalServer()
         }
     }
 
@@ -58,11 +62,15 @@ export class KeycloakAuth implements AuthRepository {
                     .setPath(`/realms/${this._realm}/protocol/openid-connect/token`)
                     .fetch()
             const data = await resp.json()
+            if(data.error) throw CustomError.badRequest('No se ha podido refrescar la sesion')
             return KeycloakResponsesAdapter.toLoginUser(data);
         
         } catch (error) {
             console.error(error);
-            throw CustomError.unauthorized('No se pudo autenticar el usuario.')
+            if(error instanceof CustomError){
+                throw error
+            }
+            throw CustomError.internalServer()
         }
     }
 

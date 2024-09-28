@@ -1,6 +1,6 @@
 import { Response } from "express";
-import { ServerResponse } from "../../../core/interfaces";
-import { CustomError } from "../../../core/models";
+import { ServerResponse } from "../../../interfaces";
+import { CustomError } from "../../../models";
 
 export abstract class Controller{
 
