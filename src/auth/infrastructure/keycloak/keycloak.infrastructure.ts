@@ -1,7 +1,7 @@
 import { KeycloakFetch } from "../../../core/keycloak/keycloak-fetch";
 import { CustomError } from '../../../core/models';
 
-import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, RegisterRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
+import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
 import { LoginUser, InvalidTokenStatus, ValidTokenStatus } from "../../domain/entities";
 import { AuthRepository } from "../../domain/repository";
 import { KeycloakConnectionProps } from "./interfaces";
@@ -116,13 +116,6 @@ export class KeycloakAuth implements AuthRepository {
             console.error(error);
             throw CustomError.unauthorized('No se pudo cerrar la session')
         }
-    }
-
-    register(registerDto: RegisterRequestDto): Promise<LoginUser> {
-
-        console.log(registerDto)
-
-        throw new Error("Method not implemented.");
     }
     
 }

@@ -1,4 +1,5 @@
-import { LoginRequestDto, LoginResponseDto } from "../domain/dtos";
+import { LoginRequestDto } from "../domain/dtos";
+import { LoginUser } from "../domain/entities";
 import { AuthRepository } from "../domain/repository";
 import { UserLoginUseCase } from "../domain/use-cases";
 
@@ -8,9 +9,9 @@ export class UserLogin implements UserLoginUseCase{
         private readonly authRepository: AuthRepository
     ){}
 
-    async execute(loginDto: LoginRequestDto): Promise<LoginResponseDto> {
+    async execute(loginDto: LoginRequestDto): Promise<LoginUser> {
         const auth = await this.authRepository.login(loginDto)
-        return new LoginResponseDto(auth)
+        return auth
     }
 
 }

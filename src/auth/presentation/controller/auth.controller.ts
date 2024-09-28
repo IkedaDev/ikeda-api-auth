@@ -5,6 +5,7 @@ import * as Dto from '../../domain/dtos';
 import { AuthRepository } from '../../domain/repository';
 import * as UseCase from '../../use-cases';
 import { ServerResponse } from '../../../core/interfaces';
+import { CustomError } from '../../../core/models';
 
 export class AuthController extends Controller{
 
@@ -20,7 +21,7 @@ export class AuthController extends Controller{
         .then((response)=>{
             res.status(200).json({
                 status:true,
-                response
+                response: new Dto.LoginResponseDto(response)
             } as ServerResponse<Dto.LoginResponseDto> )
         })
         .catch( (error) => this.handleError(error, res) )
@@ -32,7 +33,7 @@ export class AuthController extends Controller{
         .then((response) => {
             res.status(200).json({
                 status: true,
-                response
+                response: new Dto.RefreshResponseDto(response)
             } as ServerResponse<Dto.RefreshResponseDto>)
         })
         .catch( (error) => this.handleError(error, res) )
@@ -45,20 +46,8 @@ export class AuthController extends Controller{
         .then((response) => {
             res.status(200).json({
                 status: true,
-                response
+                response: new Dto.VerifyTokenResponseDto(response)
             } as ServerResponse<Dto.VerifyTokenResponseDto>)
-        })
-        .catch( (error) => this.handleError(error, res) )
-    }
-
-    register(req: Request, res: Response){
-        const registerDto = new Dto.RegisterRequestDto(req.body)
-        new UseCase.RegisterUser(this.authRepository).execute(registerDto)
-        .then((response) => {
-            res.status(200).json({
-                status: true,
-                response
-            })
         })
         .catch( (error) => this.handleError(error, res) )
     }
@@ -74,8 +63,11 @@ export class AuthController extends Controller{
         .then((response) => {
             res.status(200).json({
                 status: true,
-                response
-            })
+                response:  new Dto.LogoutResponseDto({ 
+                    ok: response,
+                    message: response ? 'La sesion a sido cerrada' : 'No se ha podido cerrar la sesion'
+                } )
+            } as ServerResponse<Dto.LogoutResponseDto>)
         })
         .catch( (error) => this.handleError(error, res) )
     }

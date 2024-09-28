@@ -1,5 +1,6 @@
-import { RefreshRequestDto, RefreshResponseDto } from "../dtos";
+import { RefreshRequestDto } from "../dtos";
+import { LoginUser } from "../entities";
 
 export abstract class RefreshTokenUseCase{
-    abstract execute( refreshDto: RefreshRequestDto ): Promise<RefreshResponseDto>
+    abstract execute( refreshDto: RefreshRequestDto ): Promise<LoginUser>
 }

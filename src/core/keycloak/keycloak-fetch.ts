@@ -5,16 +5,18 @@ interface Props {
     clientSecret: string
     keycloakUrl: string
 }
-
+type HttpMethods = 'GET' | 'POST' | 'PUT'
 export class KeycloakFetch {
 
     private _keycloakUrl: string = ''
     private _path: string = ''
-    private _method: 'GET' | 'POST' = 'POST'
+    private _method: HttpMethods = 'POST'
     private _clientId : string
     private _clientSecret : string
     private _params: URLSearchParams
     private _headers: HeadersInit = { 'Content-Type': 'application/x-www-form-urlencoded' }
+    private _body: Object = {}
+    private _haveBodyJson: boolean = false
 
     constructor({ clientId, clientSecret, keycloakUrl }:Props){
         this._clientId = clientId
@@ -27,6 +29,7 @@ export class KeycloakFetch {
     }    
 
     private clear(){
+        this._haveBodyJson = false;
         this._headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
         this._method = 'POST'
         this._params = new URLSearchParams({
@@ -36,12 +39,19 @@ export class KeycloakFetch {
         return this
     }
 
-    setMethod(method: 'GET' | 'POST') {
+    setMethod(method: HttpMethods) {
         this._method = method
         return this
     }
 
+    setBody(body:Object): KeycloakFetch{
+        this._haveBodyJson = true;
+        this._body = body
+        return this
+    }
+
     setPath(path:string): KeycloakFetch{
+        this._haveBodyJson = false;
         this._path = path
         return this
     }
@@ -68,7 +78,7 @@ export class KeycloakFetch {
         }else{
             response = await fetch(`${this._keycloakUrl}${this._path}`, {
                 method: this._method,
-                body: this._params.toString(),
+                body: this._haveBodyJson ? JSON.stringify(this._body) : this._params.toString(),
                 headers: this._headers,
             });
         }

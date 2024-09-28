@@ -5,6 +5,15 @@ import { VerifyToken } from '../../use-cases'
 import { ServerResponse } from '../../../core/interfaces'
 import { CustomError } from '../../../core/models'
 import { keycloakAuth } from '../../../core/bootstrapper/repository'
+import { InvalidTokenStatus } from '../../domain/entities'
+
+declare global {
+    namespace Express {
+      interface Request {
+        user?: { id: string; email: string };
+      }
+    }
+  }
 
 export const validateAccessToken = ( authRepository: AuthRepository = keycloakAuth ) => {
 
@@ -19,19 +28,23 @@ export const validateAccessToken = ( authRepository: AuthRepository = keycloakAu
         }
         
         try {
-            const { status } = await new VerifyToken(authRepository).execute(new VerifyTokenRequestDto({access_token}))
-            if( !status ){
+            const verifytokenResponse = await new VerifyToken(authRepository).execute(new VerifyTokenRequestDto({access_token}))
+            if( verifytokenResponse instanceof InvalidTokenStatus ){
                 res.status(400).json({
                     status: false,
                     response:'El token no es valido'
                 } as ServerResponse<string>)
                 return
             }
+            req.user = {
+                id: verifytokenResponse.sub,
+                email: verifytokenResponse.email
+            }
+            next()
+
         } catch (error) {
             _handlerErrorVerifyToken(error, res)
         }
-
-        next()
     }
 }
 

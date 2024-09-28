@@ -20,7 +20,6 @@ export class UserRouter {
             validateFields,
         ],   ( req: Request, res: Response ) => controller.userInfo(req, res) )
 
-
         return router
     }
     

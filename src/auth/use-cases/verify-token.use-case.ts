@@ -1,4 +1,5 @@
-import { VerifyTokenRequestDto, VerifyTokenResponseDto } from "../domain/dtos";
+import { VerifyTokenRequestDto } from "../domain/dtos";
+import { InvalidTokenStatus, ValidTokenStatus } from "../domain/entities";
 import { AuthRepository } from "../domain/repository";
 import { VerifyTokenUseCase } from "../domain/use-cases";
 
@@ -8,9 +9,9 @@ export class VerifyToken implements VerifyTokenUseCase{
         private readonly authRepository: AuthRepository
     ){}
 
-    async execute(verifyDto: VerifyTokenRequestDto): Promise<VerifyTokenResponseDto> {
+    async execute(verifyDto: VerifyTokenRequestDto): Promise<ValidTokenStatus | InvalidTokenStatus> {
         const verifyResponse = await this.authRepository.verifyToken(verifyDto)
-        return new VerifyTokenResponseDto({ status: verifyResponse.status })
+        return verifyResponse
     }
 
 }

@@ -26,17 +26,6 @@ export class AuthRouter {
             check('refresh_token','El refresh_token debe ser un JWT').isJWT(),
             validateFields,
         ],   ( req: Request, res: Response ) => controller.refresh(req, res) )
-        
-        router.post('/register',[
-            check('username','El username es obligatorio').not().isEmpty(),
-            check('username','El username debe ser un string').isString(),
-            check('username','El username debe tener minimo 4 caracteres').isLength({min:4}),
-            check('email','El email es obligatorio').not().isEmpty(),
-            check('email','El email debe ser un email valido').isEmail(),
-            check('password','El password es obligatorio').not().isEmpty(),
-            check('password','La contraseña debe tener minimo 6 caracteres').isLength({min:6}),
-            validateFields,
-        ],   ( req: Request, res: Response ) => controller.register(req, res) )
 
         router.post('/verify',[
             check('Authorization','El token de authorization es obligatorio').not().isEmpty(),

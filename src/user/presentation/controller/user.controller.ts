@@ -4,6 +4,7 @@ import { Controller } from '../../../core/server/express/controller';
 import * as Dto from '../../domain/dtos';
 import { UserRepository } from '../../domain/repository';
 import * as UseCase from '../../use-cases';
+import { CustomError } from '../../../core/models';
 
 export class UserController extends Controller{
 

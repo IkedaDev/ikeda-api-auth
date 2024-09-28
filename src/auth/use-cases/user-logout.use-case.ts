@@ -1,4 +1,4 @@
-import { LogoutRequestDto, LogoutResponseDto } from "../domain/dtos";
+import { LogoutRequestDto } from "../domain/dtos";
 import { AuthRepository } from "../domain/repository";
 import { UserLogoutUseCase } from "../domain/use-cases";
 
@@ -8,12 +8,9 @@ export class UserLogout implements UserLogoutUseCase{
         private readonly authRepository: AuthRepository
     ){}
 
-    async execute(logoutDto: LogoutRequestDto): Promise<LogoutResponseDto> {
+    async execute(logoutDto: LogoutRequestDto): Promise<boolean> {
         const resp = await this.authRepository.logout(logoutDto)
-        return new LogoutResponseDto({ 
-            ok: resp,
-            message: resp ? 'La sesion a sido cerrada' : 'No se ha podido cerrar la sesion'
-        })
+        return resp
     }
 
 }

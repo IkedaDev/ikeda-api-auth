@@ -1,7 +1,7 @@
 
 
-import { LogoutRequestDto, LogoutResponseDto } from "../dtos";
+import { LogoutRequestDto } from "../dtos";
 
 export abstract class UserLogoutUseCase{
-    abstract execute( logoutDto: LogoutRequestDto ): Promise<LogoutResponseDto>
+    abstract execute( logoutDto: LogoutRequestDto ): Promise<boolean>
 }

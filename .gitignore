@@ -1,3 +1,4 @@
 node_modules
 keycloak_data
+dist
 .env
