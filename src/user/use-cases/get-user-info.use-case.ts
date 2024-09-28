@@ -1,15 +1,15 @@
 import { UserInfoRequestDto, UserInfoResponsetDto } from "../domain/dtos";
-import { AuthRepository } from "../domain/repository";
+import { UserRepository } from "../domain/repository";
 import { GetUserInfoUseCase } from "../domain/use-cases";
 
 export class GetUserInfo implements GetUserInfoUseCase{
 
     constructor(
-        private readonly authRepository: AuthRepository
+        private readonly userRepository: UserRepository
     ){}
 
     async execute(userInfoDto: UserInfoRequestDto): Promise<UserInfoResponsetDto> {
-        const userInfo = await this.authRepository.userInfo(userInfoDto)
+        const userInfo = await this.userRepository.info(userInfoDto)
         return new UserInfoResponsetDto(userInfo)
     }
 

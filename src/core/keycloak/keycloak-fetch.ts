@@ -26,6 +26,16 @@ export class KeycloakFetch {
         })
     }    
 
+    private clear(){
+        this._headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+        this._method = 'POST'
+        this._params = new URLSearchParams({
+            'client_id': this._clientId,
+            'client_secret': this._clientSecret,
+        })
+        return this
+    }
+
     setMethod(method: 'GET' | 'POST') {
         this._method = method
         return this
@@ -49,18 +59,22 @@ export class KeycloakFetch {
     }
 
     async fetch(): Promise<Response>{
+        let response
         if(this._method === 'GET'){
-            return await fetch(`${this._keycloakUrl}${this._path}`, {
+            response =  await fetch(`${this._keycloakUrl}${this._path}`, {
                 method: this._method,
                 headers: this._headers,
             });
+        }else{
+            response = await fetch(`${this._keycloakUrl}${this._path}`, {
+                method: this._method,
+                body: this._params.toString(),
+                headers: this._headers,
+            });
         }
-        
-        return await fetch(`${this._keycloakUrl}${this._path}`, {
-            method: this._method,
-            body: this._params.toString(),
-            headers: this._headers,
-        });
+        this.clear()
+
+        return response
     }
 
 }

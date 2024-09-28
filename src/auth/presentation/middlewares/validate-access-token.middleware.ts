@@ -4,9 +4,9 @@ import { AuthRepository } from '../../domain/repository'
 import { VerifyToken } from '../../use-cases'
 import { ServerResponse } from '../../../core/interfaces'
 import { CustomError } from '../../../core/models'
+import { keycloakAuth } from '../../../core/bootstrapper/repository'
 
-
-export const validateAccessToken = ( authRepository: AuthRepository ) => {
+export const validateAccessToken = ( authRepository: AuthRepository = keycloakAuth ) => {
 
     return async( req: Request, res: Response, next: NextFunction ): Promise<void> => {
         const access_token = (req.headers['authorization'] as string).split(' ')[1]

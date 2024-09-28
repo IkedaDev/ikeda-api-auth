@@ -1,8 +1,8 @@
 import { KeycloakFetch } from "../../../core/keycloak/keycloak-fetch";
 import { CustomError } from '../../../core/models';
 
-import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, RegisterRequestDto, UserInfoRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
-import { LoginUser, InvalidTokenStatus, ValidTokenStatus, UserInfo } from "../../domain/entities";
+import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, RegisterRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
+import { LoginUser, InvalidTokenStatus, ValidTokenStatus } from "../../domain/entities";
 import { AuthRepository } from "../../domain/repository";
 import { KeycloakConnectionProps } from "./interfaces";
 import { KeycloakResponsesAdapter } from "./adapters";
@@ -78,7 +78,6 @@ export class KeycloakAuth implements AuthRepository {
                     .setPath(`/realms/${this._realm}/protocol/openid-connect/token/introspect`)
                     .fetch()
             const data = await resp.json()
-
             if( !data.active ) return KeycloakResponsesAdapter.toInValidTokenStatus(data)
                 
             return KeycloakResponsesAdapter.toValidTokenStatus(data)
@@ -86,24 +85,6 @@ export class KeycloakAuth implements AuthRepository {
         } catch (error) {
             console.error(error);
             throw CustomError.unauthorized('No se pudo verificar el token.')
-        }
-    }
-
-    async userInfo( userInfoDto: UserInfoRequestDto ): Promise<UserInfo>{
-        try {           
-            const resp = await this._keycloackFetchBuilder
-                    .setPath(`/realms/${this._realm}/protocol/openid-connect/userinfo`)
-                    .setMethod('GET')
-                    .setHeaders({ 
-                        'Authorization': `Bearer ${userInfoDto.accessToken}`,
-                        'Content-Type': 'application/json'
-                    })
-                    .fetch()
-            const userInfo = await resp.json()
-            return KeycloakResponsesAdapter.toUserInfo(userInfo)
-        } catch (error) {
-            console.error(error);
-            throw CustomError.unauthorized('No se pudo obtener la informacion del usuario')
         }
     }
 

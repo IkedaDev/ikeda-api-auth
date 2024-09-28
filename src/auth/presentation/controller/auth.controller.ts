@@ -51,19 +51,6 @@ export class AuthController extends Controller{
         .catch( (error) => this.handleError(error, res) )
     }
 
-    userInfo(req: Request, res: Response){
-        const access_token = req.headers['authorization'] as string 
-        const userInfoDto = new Dto.UserInfoRequestDto({access_token: access_token.split(' ')[1]})
-        new UseCase.GetUserInfo(this.authRepository).execute(userInfoDto)
-        .then((response) => {
-            res.status(200).json({
-                status: true,
-                response
-            })
-        })
-        .catch( (error) => this.handleError(error, res) )
-    }
-
     register(req: Request, res: Response){
         const registerDto = new Dto.RegisterRequestDto(req.body)
         new UseCase.RegisterUser(this.authRepository).execute(registerDto)

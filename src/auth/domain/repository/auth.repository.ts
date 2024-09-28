@@ -1,5 +1,5 @@
-import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, RegisterRequestDto, UserInfoRequestDto, VerifyTokenRequestDto } from "../dtos";
-import { LoginUser, InvalidTokenStatus, ValidTokenStatus, UserInfo } from "../entities";
+import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, RegisterRequestDto, VerifyTokenRequestDto } from "../dtos";
+import { LoginUser, InvalidTokenStatus, ValidTokenStatus } from "../entities";
 
 
 export abstract class AuthRepository {
@@ -7,6 +7,5 @@ export abstract class AuthRepository {
     abstract refreshToken( refreshDto: RefreshRequestDto ): Promise<LoginUser>
     abstract register( registerDto: RegisterRequestDto ): Promise<LoginUser>
     abstract verifyToken( verifyTokenDto: VerifyTokenRequestDto ): Promise<ValidTokenStatus | InvalidTokenStatus>
-    abstract userInfo( userInfoDto: UserInfoRequestDto ): Promise<UserInfo>
     abstract logout( logoutDto: LogoutRequestDto ): Promise<boolean>
 }
