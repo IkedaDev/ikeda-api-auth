@@ -1,10 +1,10 @@
+import { KeycloakRepositoryBaseProps } from "src/core/interfaces";
 import { KeycloakFetch } from "../../../core/keycloak/keycloak-fetch";
 import { CustomError } from '../../../core/models';
 
 import { LoginRequestDto, LogoutRequestDto, RefreshRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
 import { LoginUser, InvalidTokenStatus, ValidTokenStatus } from "../../domain/entities";
 import { AuthRepository } from "../../domain/repository";
-import { KeycloakConnectionProps } from "./interfaces";
 import { KeycloakResponsesAdapter } from "./adapters";
 
 export class KeycloakAuth implements AuthRepository {
@@ -12,7 +12,7 @@ export class KeycloakAuth implements AuthRepository {
     private readonly _keycloackFetchBuilder : KeycloakFetch
     private readonly _realm: string 
 
-    constructor(props: KeycloakConnectionProps){
+    constructor(props: KeycloakRepositoryBaseProps){
         this._keycloackFetchBuilder = new KeycloakFetch({
             clientId: props.clientId, 
             clientSecret: props.clientSecret, 

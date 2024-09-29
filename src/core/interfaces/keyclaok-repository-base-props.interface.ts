@@ -1,4 +1,4 @@
-export interface KeycloakConnectionProps {
+export interface KeycloakRepositoryBaseProps {
     url: string
     clientId: string
     clientSecret: string

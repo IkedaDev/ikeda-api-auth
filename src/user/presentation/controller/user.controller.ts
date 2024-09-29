@@ -4,7 +4,7 @@ import { Controller } from '../../../core/server/express/controller';
 import * as Dto from '../../domain/dtos';
 import { UserRepository } from '../../domain/repository';
 import * as UseCase from '../../use-cases';
-import { CustomError } from '../../../core/models';
+import { ServerResponse } from '../../../core/interfaces';
 
 export class UserController extends Controller{
 
@@ -21,8 +21,8 @@ export class UserController extends Controller{
         .then((response) => {
             res.status(200).json({
                 status: true,
-                response
-            })
+                response: new Dto.UserInfoResponsetDto(response)
+            } as ServerResponse<Dto.UserInfoResponsetDto>)
         })
         .catch( (error) => this.handleError(error, res) )
     }

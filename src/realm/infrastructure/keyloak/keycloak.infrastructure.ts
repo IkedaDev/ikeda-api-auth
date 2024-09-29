@@ -1,13 +1,12 @@
+import { CustomError } from "../../../core/models";
 import { KeycloakFetch } from "../../../core/keycloak/keycloak-fetch";
-import { CustomError } from '../../../core/models';
 import { KeycloakRepositoryBaseProps } from "../../../core/interfaces";
 
-import { UserInfoRequestDto } from "../../domain/dtos";
-import { UserInfo } from "../../domain/entities";
-import { UserRepository } from "../../domain/repository";
+import { RealmRepository } from "../../domain/infrastructure";
 import { KeycloakResponsesAdapter } from "./adapters";
+import { ClientCredentials } from "../../domain/entity";
 
-export class KeycloakUser implements UserRepository {
+export class KeycloakRealm implements RealmRepository {
 
     private readonly _keycloackFetchBuilder : KeycloakFetch
     private readonly _realm: string 
@@ -21,19 +20,19 @@ export class KeycloakUser implements UserRepository {
         this._realm = props.realm
     }
 
-    async info( userInfoDto: UserInfoRequestDto ): Promise<UserInfo>{
+
+    async getClientCredentials(): Promise<ClientCredentials> {
         try {           
             const resp = await this._keycloackFetchBuilder
-                    .setPath(`/realms/${this._realm}/protocol/openid-connect/userinfo`)
-                    .setMethod('GET')
-                    .setHeaders({ 
-                        'Authorization': `Bearer ${userInfoDto.accessToken}`,
-                        'Content-Type': 'application/json'
-                    })
+                    .setPath(`/realms/${this._realm}/protocol/openid-connect/token`)
+                    .setMethod('POST')
+                    .setParams(new URLSearchParams({
+                        grant_type:'client_credentials'
+                    }))
                     .fetch()
-            const userInfo = await resp.json()
-            if(userInfo.error) throw CustomError.badRequest('No se pudo obtener la informacion del usuario')
-            return KeycloakResponsesAdapter.toUserInfo(userInfo)
+            const credentials = await resp.json()
+            if(credentials.error) throw CustomError.badRequest('No se pudo obtener la informacion del usuario')
+            return KeycloakResponsesAdapter.toGetClientCredentials(credentials)
         } catch (error) {
             console.error(error);
             if(error instanceof CustomError){
@@ -42,6 +41,4 @@ export class KeycloakUser implements UserRepository {
             throw CustomError.internalServer()
         }
     }
-
-    
 }
