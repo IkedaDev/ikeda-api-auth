@@ -17,6 +17,8 @@ export class KeycloakFetch {
     private _headers: HeadersInit = { 'Content-Type': 'application/x-www-form-urlencoded' }
     private _body: Object = {}
     private _haveBodyJson: boolean = false
+    private _haveParams: boolean = false
+
 
     constructor({ clientId, clientSecret, keycloakUrl }:Props){
         this._clientId = clientId
@@ -27,17 +29,6 @@ export class KeycloakFetch {
             'client_secret': this._clientSecret,
         })
     }    
-
-    private clear(){
-        this._haveBodyJson = false;
-        this._headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
-        this._method = 'POST'
-        this._params = new URLSearchParams({
-            'client_id': this._clientId,
-            'client_secret': this._clientSecret,
-        })
-        return this
-    }
 
     setMethod(method: HttpMethods) {
         this._method = method
@@ -58,6 +49,7 @@ export class KeycloakFetch {
 
     setParams(params: URLSearchParams): KeycloakFetch{
         if(params && params.toString().length > 0){
+            this._haveParams = true
             params.forEach((value, key) => this._params.append(key, value) );
         }
         return this
@@ -71,7 +63,7 @@ export class KeycloakFetch {
     async fetch(): Promise<Response>{
         let response
         if(this._method === 'GET'){
-            response =  await fetch(`${this._keycloakUrl}${this._path}`, {
+            response =  await fetch(`${this._keycloakUrl}${this._path}?${this._haveParams && this._params.toString()}`, {
                 method: this._method,
                 headers: this._headers,
             });
@@ -85,6 +77,18 @@ export class KeycloakFetch {
         this.clear()
 
         return response
+    }
+
+    private clear(){
+        this._haveParams = false
+        this._haveBodyJson = false;
+        this._headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+        this._method = 'POST'
+        this._params = new URLSearchParams({
+            'client_id': this._clientId,
+            'client_secret': this._clientSecret,
+        })
+        return this
     }
 
 }

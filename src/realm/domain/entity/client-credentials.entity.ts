@@ -8,10 +8,10 @@ interface Props{
 
 export class ClientCredentials {
 
-    private readonly accessToken: string 
-    private readonly expiresIn: number 
-    private readonly tokenType: string 
-    private readonly scope: string 
+    public readonly accessToken: string 
+    public readonly expiresIn: number 
+    public readonly tokenType: string 
+    public readonly scope: string 
 
     constructor({accessToken, expiresIn, tokenType, scope}:Props){
         this.accessToken = accessToken
