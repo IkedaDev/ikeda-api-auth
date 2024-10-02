@@ -1,5 +1,6 @@
-import { GetUrlPropsRepository, GoogleAuthProviderProps } from "src/auth/domain/interfaces";
-import { SocialAuthProvider } from "src/auth/domain/repository";
+import { GetUrlPropsRepository, GoogleAuthProviderProps } from "../../domain/interfaces";
+import { SocialAuthProvider } from "../../domain/repository";
+import { UUIDGenerator } from "../../../core/utils";
 
 
 export class GoogleAuthProvider implements SocialAuthProvider{
@@ -17,7 +18,7 @@ export class GoogleAuthProvider implements SocialAuthProvider{
             client_id: this.clientId,
             scope: 'openid profile email',
             response_type: 'code',
-            state: 'm4Lrwn0BasdfasdfasdS1jOTMwN2IyNDJmOWYifQ'
+            state: UUIDGenerator.v7()
         }
 
         const queryParams = new URLSearchParams(params)

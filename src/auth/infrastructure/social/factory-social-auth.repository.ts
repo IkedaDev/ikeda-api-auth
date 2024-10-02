@@ -3,7 +3,7 @@ import { ISocialAuthFactory, SocialAuthProvider } from "../../../auth/domain/rep
 import { SOCIAL_AUTH_PROVIDER } from "../../domain/enum";
 import { GoogleAuthProvider } from "./google-auth.repository";
 import { CustomError } from "../../../core/models";
-import { Envs } from "../../../core/adapters/env";
+import { Envs } from "../../../core/utils";
 
 
 export class SocialAuthFactory implements ISocialAuthFactory{

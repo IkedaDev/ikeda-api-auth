@@ -2,7 +2,7 @@ import { KeycloakUser } from "../../../user/infrastructure";
 import { KeycloakAuth } from "../../../auth/infrastructure";
 import { KeycloakRealm } from "../../../realm/infrastructure";
 
-import { Envs } from "../../adapters/env";
+import { Envs } from "../../utils";
 
 const baseConfig = {
     url: Envs.KEYCLOAK_URL,
