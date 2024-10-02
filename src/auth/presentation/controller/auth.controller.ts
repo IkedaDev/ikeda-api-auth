@@ -2,17 +2,22 @@ import { Response, Request } from 'express'
 
 import { Controller } from '../../../core/server/express/controller';
 import * as Dto from '../../domain/dtos';
-import { AuthRepository } from '../../domain/repository';
+import { AuthRepository, ISocialAuthFactory } from '../../domain/repository';
 import * as UseCase from '../../use-cases';
 import { ServerResponse } from '../../../core/interfaces';
-import { CustomError } from '../../../core/models';
+import { AuthControllerProps } from '../../domain/interfaces';
+import { SOCIAL_AUTH_PROVIDER } from 'src/auth/domain/enum';
+
+
 
 export class AuthController extends Controller{
-
-    constructor(
-        private readonly authRepository: AuthRepository
-    ){
+    private readonly authRepository: AuthRepository
+    private readonly socialAuthFactory: ISocialAuthFactory
+    
+    constructor({ authRepository, socialAuthFactory }: AuthControllerProps){
         super()
+        this.authRepository = authRepository
+        this.socialAuthFactory = socialAuthFactory
     }
 
     login(req: Request, res: Response){
@@ -27,6 +32,21 @@ export class AuthController extends Controller{
         .catch( (error) => this.handleError(error, res) )
     }
     
+    socialLogin(req: Request, res: Response){
+        const requestDto = new Dto.GetUrlSocialLoginRequestDto({
+            provider: req.query.provider as SOCIAL_AUTH_PROVIDER, 
+            redirect_url: req.query.redirect_url as string
+        })
+        new UseCase.GetUrlSocialLogin(this.socialAuthFactory).execute({ provider: requestDto.provider, redirect_url: requestDto.redirectUrl })
+        .then((response) => {
+            res.status(200).json({
+                status: true,
+                response: new Dto.GetUrlSocialLoginResponseDto({url : response})
+            } as ServerResponse<Dto.GetUrlSocialLoginResponseDto>)
+        })
+        .catch( (error) => this.handleError(error, res) )
+    }
+
     refresh(req: Request, res: Response){
         const refreshDto = new Dto.RefreshRequestDto({...req.body})
         new UseCase.RefreshToken(this.authRepository).execute(refreshDto)
