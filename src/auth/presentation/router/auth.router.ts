@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { check } from 'express-validator'
 import { validateFields } from '../../../core/server/express/middlewares'
-import { keycloakAuth, socialAuthFactory, } from '../../../core/bootstrapper/repository'
+import { keycloakAuth, keycloakRealm, socialAuthFactory, } from '../../../core/bootstrapper/repository'
 import { AuthController } from '../controller/auth.controller'
 import { validateAccessToken } from '../middlewares'
 import { SOCIAL_AUTH_PROVIDER } from '../../domain/enum'
@@ -12,7 +12,7 @@ export class AuthRouter {
     static get router(): Router {
         const router = Router()
 
-        const authService = new AuthService({socialAuthFactory})
+        const authService = new AuthService({socialAuthFactory,realmRepository: keycloakRealm})
         const controller = new AuthController( { authRepository: keycloakAuth, socialAuthFactory: socialAuthFactory, authService} )
 
         router.post('/login',[

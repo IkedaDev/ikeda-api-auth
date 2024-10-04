@@ -1,5 +1,5 @@
 import { CreateProviderProps } from "../dtos";
-import { SocialAccessToken } from "../entities";
+import { SocialAccessToken, SocialUserLogin } from "../entities";
 import { GetAccessTokenPropsRepository, GetProfilePropsRepository, GetUrlPropsRepository } from "../interfaces";
 
 
@@ -11,5 +11,5 @@ export abstract class ISocialAuthFactory {
 export abstract class SocialAuthProvider {
     abstract getUrl( options : GetUrlPropsRepository ): Promise<string>
     abstract getAccessToken(options: GetAccessTokenPropsRepository): Promise<SocialAccessToken>
-    abstract getUserProfile(options: GetProfilePropsRepository): Promise<any>
+    abstract getUserProfile(options: GetProfilePropsRepository): Promise<SocialUserLogin>
 }

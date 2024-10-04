@@ -2,8 +2,8 @@ import { GetAccessTokenPropsRepository, GetProfilePropsRepository, GetUrlPropsRe
 import { SocialAuthProvider } from "../../domain/repository";
 import { UUIDGenerator } from "../../../core/utils";
 import { CustomError } from "../../../core/models";
-import { SocialAccessToken } from "../../domain/entities";
-import { GetAccessTokenGoogle } from "./interfaces";
+import { SocialAccessToken, SocialUserLogin } from "../../domain/entities";
+import { GetAccessTokenGoogle, GetUserInfoGoogle } from "./interfaces";
 
 
 export class GoogleAuthProvider implements SocialAuthProvider{
@@ -62,7 +62,30 @@ export class GoogleAuthProvider implements SocialAuthProvider{
         }
     }
 
-    async getUserProfile(options: GetProfilePropsRepository): Promise<any> {
-        throw new Error("Method not implemented.");
+    async getUserProfile(options: GetProfilePropsRepository): Promise<SocialUserLogin> {
+        try {
+            const resp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
+                method:'GET',
+                headers:{
+                    'authorization': `${options.tokenType} ${options.accessToken}`
+                }
+            })
+            if([401].includes(resp.status)) throw CustomError.unauthorized('Token Invalido')
+            const data: GetUserInfoGoogle = await resp.json()
+            return new SocialUserLogin({
+                email: data.email,
+                emailVerified: data.email_verified,
+                firstname: data.given_name,
+                lastname: data.family_name,
+                username: data.name.replace(/\s+/g, ''),
+                img: data.picture
+            })
+        } catch (error) {
+            console.error(error);
+            if(error instanceof CustomError){
+                throw error
+            }
+            throw CustomError.internalServer()
+        }
     }
 }

@@ -1,1 +1,1 @@
-export * from './get-access-token-google.interface'
+export * from './google-response.interface'
