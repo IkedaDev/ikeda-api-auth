@@ -13,7 +13,8 @@ export class SocialAuthFactory implements ISocialAuthFactory{
     constructor(){
         this.providers = {
             [SOCIAL_AUTH_PROVIDER.GOOGLE]: new GoogleAuthProvider({
-                clientId: Envs.AUTH_OAUTH_GOOGLE_CIENT_ID
+                clientId: Envs.AUTH_OAUTH_GOOGLE_CIENT_ID,
+                clientSecret: Envs.AUTH_OAUTH_GOOGLE_CIENT_SECRET,
             })
         }
     }

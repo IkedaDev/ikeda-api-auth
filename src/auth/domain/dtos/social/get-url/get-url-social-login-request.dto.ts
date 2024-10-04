@@ -1,4 +1,4 @@
-import { SOCIAL_AUTH_PROVIDER } from "../../enum"
+import { SOCIAL_AUTH_PROVIDER } from "../../../enum"
 
 interface Props{
     provider: SOCIAL_AUTH_PROVIDER

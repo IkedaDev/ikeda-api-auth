@@ -7,17 +7,20 @@ import * as UseCase from '../../use-cases';
 import { ServerResponse } from '../../../core/interfaces';
 import { AuthControllerProps } from '../../domain/interfaces';
 import { SOCIAL_AUTH_PROVIDER } from 'src/auth/domain/enum';
+import { IAuthService } from 'src/auth/domain/services';
 
 
 
 export class AuthController extends Controller{
     private readonly authRepository: AuthRepository
     private readonly socialAuthFactory: ISocialAuthFactory
+    private readonly authService: IAuthService
     
-    constructor({ authRepository, socialAuthFactory }: AuthControllerProps){
+    constructor({ authRepository, socialAuthFactory, authService }: AuthControllerProps){
         super()
         this.authRepository = authRepository
         this.socialAuthFactory = socialAuthFactory
+        this.authService = authService
     }
 
     login(req: Request, res: Response){
@@ -33,6 +36,24 @@ export class AuthController extends Controller{
     }
     
     socialLogin(req: Request, res: Response){
+        const requestDto = new Dto.SocialLoginRequestDto({
+            provider: req.body.provider as SOCIAL_AUTH_PROVIDER, 
+            code: req.body.code as string,
+            redirect_url: req.body.redirect_url as string
+        })
+        this.authService.socialLogin(requestDto)
+            .then( response => {
+                res.status(200).json({
+                    status: true,
+                    response: response
+                } as ServerResponse<any>)
+            })
+            .catch( (error) => this.handleError(error, res) )
+        
+    }
+
+
+    getUrlSocialLogin(req: Request, res: Response){
         const requestDto = new Dto.GetUrlSocialLoginRequestDto({
             provider: req.query.provider as SOCIAL_AUTH_PROVIDER, 
             redirect_url: req.query.redirect_url as string
