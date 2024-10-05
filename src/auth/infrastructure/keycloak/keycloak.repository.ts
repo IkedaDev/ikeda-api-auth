@@ -2,7 +2,7 @@ import { KeycloakRepositoryBaseProps } from "../../../core/interfaces";
 import { KeycloakFetch } from "../../../core/keycloak/keycloak-fetch";
 import { CustomError } from '../../../core/models';
 
-import { LogoutRequestDto, RefreshRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
+import { BindIdentityProviderRepositoryDto, LogoutRequestDto, RefreshRequestDto, VerifyTokenRequestDto } from "../../domain/dtos";
 import { LoginUser, InvalidTokenStatus, ValidTokenStatus } from "../../domain/entities";
 import { AuthRepository } from "../../domain/repository";
 import { KeycloakResponsesAdapter } from "./adapters";
@@ -21,32 +21,31 @@ export class KeycloakAuth implements AuthRepository {
         this._realm = props.realm
     }
 
-    // async login(loginRequestDto: LoginRequestDto): Promise<LoginUser> {
-    //     try {           
-    //         const params = new URLSearchParams({
-    //             'scope': 'openid',
-    //             'grant_type': 'password',
-    //             'username': loginRequestDto.username,
-    //             'password': loginRequestDto.password,
-    //         });
-
-    //         const resp = await this._keycloackFetchBuilder
-    //                 .setParams(params)
-    //                 .setMethod('POST')
-    //                 .setPath(`/realms/${this._realm}/protocol/openid-connect/token`)
-    //                 .fetch()
-    //         const data = await resp.json()
-    //         if(data.error) throw CustomError.badRequest('Usuario y/o contraseña invalidos')
-    //         return KeycloakResponsesAdapter.toLoginUser(data);
+    async bindIdentityProvider(options: BindIdentityProviderRepositoryDto): Promise<boolean> {
+        try {           
+            const resp = await this._keycloackFetchBuilder
+                    .setBody({
+                        "userName": options.userProviderName,
+                        "userId": options.userProviderId
+                    })
+                    .setHeaders({ 
+                        'Authorization': `Bearer ${options.accessToken}`,
+                        'Content-Type': 'application/json'
+                    })
+                    
+                    .setMethod('POST')
+                    .setPath(`/admin/realms/${this._realm}/users/${options.userKeycloakId}/federated-identity/${options.provider}`)
+                    .fetch()
+            return resp.ok;
         
-    //     } catch (error) {
-    //         console.error(error);
-    //         if(error instanceof CustomError){
-    //             throw error
-    //         }
-    //         throw CustomError.internalServer()
-    //     }
-    // }
+        } catch (error) {
+            console.error(error);
+            if(error instanceof CustomError){
+                throw error
+            }
+            throw CustomError.internalServer()
+        }
+    }
 
     async refreshToken(refreshDto: RefreshRequestDto): Promise<LoginUser> {
         try {           

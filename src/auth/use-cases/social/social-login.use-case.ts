@@ -1,24 +1,34 @@
 import { SocialLoginUseCaseProps } from "../../domain/dtos";
 import { SocialLoginUseCase } from "../../domain/use-cases";
-import { ISocialAuthFactory } from "../../domain/repository";
+import { AuthRepository, ILoginAuthFactory, ISocialAuthFactory } from "../../domain/repository";
 import { FindUsers, GetClientCredentials } from "../../../realm/use-cases";
 import { RealmRepository } from "../../../realm/domain/infrastructure";
 import { LoginUser } from "../../domain/entities";
+import { LOGIN_TYPE } from "../../domain/enum";
+import { BindIdentityProvider } from "../bind-identity-provider.use-case";
+
 interface Props{
     socialAuthFactory: ISocialAuthFactory
     realmRepository: RealmRepository
+    loginAuthFactory: ILoginAuthFactory
+    authRepository: AuthRepository
 }
 
 export class SocialLogin implements SocialLoginUseCase {
 
     private readonly socialAuthFactory: ISocialAuthFactory
     private readonly realmRepository: RealmRepository
+    private readonly loginAuthFactory: ILoginAuthFactory
+    private readonly authRepository: AuthRepository
+
     constructor(props: Props){
         this.socialAuthFactory = props.socialAuthFactory
-            this.realmRepository = props.realmRepository
+        this.realmRepository = props.realmRepository
+        this.loginAuthFactory = props.loginAuthFactory
+        this.authRepository = props.authRepository
     }
 
-    async execute(socialLoginProps: SocialLoginUseCaseProps): Promise<any> {
+    async execute(socialLoginProps: SocialLoginUseCaseProps): Promise<LoginUser> {
         const provider = this.socialAuthFactory.createProvider({
             provider: socialLoginProps.provider
         })
@@ -39,19 +49,28 @@ export class SocialLogin implements SocialLoginUseCase {
             email: socialUser.email,
             realmAccessToken: credentials.accessToken,
         })
-        if(users.length > 0) {
-            //Intentar cambiar el token
 
-            //Si se puede FIN
-
-            //Si no se puede, vicular el ipl al con el userId del proveedor y el mail
-
-            //devolver el accessToken
+        const findUser = users.at(0)
+        if( findUser ) {
+            await new BindIdentityProvider(this.authRepository).execute({
+                accessToken: credentials.accessToken,
+                provider: socialLoginProps.provider,
+                userKeycloakId: findUser.id,
+                userProviderId: socialUser.id,
+                userProviderName: socialUser.username
+            })
         }
+        
+        const userLogin = await this.loginAuthFactory.createStrategy({
+                loginType: LOGIN_TYPE.TOKEN_EXCHANGE,
+        }).login({
+            grantType: LOGIN_TYPE.TOKEN_EXCHANGE,
+            provider: socialLoginProps.provider,
+            token: socialAccessToken.accessToken
+        })
 
-        //Cambiar el token
+        return userLogin
 
-        return socialUser
     }
 
 }

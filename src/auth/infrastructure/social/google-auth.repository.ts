@@ -73,6 +73,7 @@ export class GoogleAuthProvider implements SocialAuthProvider{
             if([401].includes(resp.status)) throw CustomError.unauthorized('Token Invalido')
             const data: GetUserInfoGoogle = await resp.json()
             return new SocialUserLogin({
+                id: data.sub,
                 email: data.email,
                 emailVerified: data.email_verified,
                 firstname: data.given_name,

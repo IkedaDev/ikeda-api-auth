@@ -42,7 +42,6 @@ export class KeycloakFetch {
     }
 
     setPath(path:string): KeycloakFetch{
-        this._haveBodyJson = false;
         this._path = path
         return this
     }
@@ -81,6 +80,7 @@ export class KeycloakFetch {
 
     private clear(){
         this._haveParams = false
+        this._body = {}
         this._haveBodyJson = false;
         this._headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
         this._method = 'POST'

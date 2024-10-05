@@ -1,4 +1,5 @@
 import { createStrategyProps } from "../dtos";
+import { LoginAuthStrategyDto } from "../dtos/login/repository/login-auth-strategy.dto";
 import { LoginUser } from "../entities";
 
 export abstract class ILoginAuthFactory{
@@ -6,5 +7,5 @@ export abstract class ILoginAuthFactory{
 } 
 
 export abstract class LoginAuthStrategy {
-    abstract login( data:Object ): Promise<LoginUser>
+    abstract login( data:LoginAuthStrategyDto ): Promise<LoginUser>
 }

@@ -2,6 +2,7 @@ export * from './login/login-request.dto'
 export * from './login/login-response.dto'
 export * from './login/use-case/user-login-props-use-case.dto'
 export * from './login/repository/create-strategy-props.dto'
+export * from './login/repository/login-auth-strategy.dto'
 
 export * from './refresh/refresh-request.dto'
 export * from './refresh/refresh-response.dto'
@@ -19,3 +20,5 @@ export * from './social/get-url/use-case/get-url-social-login-use-case.dto'
 
 export * from './social/social-login/social-login-request.dto'
 export * from './social/social-login/use-case/social-login-props.use-case'
+export * from './social/bind-identity-provider/use-case/bind-identity-provider-use-case.dto'
+export * from './social/bind-identity-provider/repository/bind-identity-provider-repository.dto'

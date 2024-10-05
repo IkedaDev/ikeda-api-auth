@@ -2,6 +2,7 @@
 
 
 interface Props{
+    id:string
     username: string
     lastname:string
     firstname:string
@@ -11,6 +12,7 @@ interface Props{
 }
 
 export class SocialUserLogin{
+    public id: string 
     public username : string 
     public lastname : string 
     public firstname : string 
@@ -19,6 +21,7 @@ export class SocialUserLogin{
     public img ?: string 
 
     constructor(props: Props) {
+        this.id = props.id
         this.username = props.username
         this.lastname = props.lastname
         this.firstname = props.firstname

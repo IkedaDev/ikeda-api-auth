@@ -25,7 +25,7 @@ export class AuthController extends Controller{
     }
 
     login(req: Request, res: Response){
-        const loginDto = new Dto.LoginRequestDto({...req.body})
+        const loginDto = new Dto.LoginRequestDto({...req.body, data:{...req.body}})
         new UseCase.UserLogin(this.loginAuthFactory).execute(loginDto)
         .then((response)=>{
             res.status(200).json({

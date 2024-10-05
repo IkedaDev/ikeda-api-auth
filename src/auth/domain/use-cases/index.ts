@@ -5,3 +5,4 @@ export * from './user-logout.use-case'
 
 export * from './social/get-url-social-login.use-case'
 export * from './social/social-login.use-case'
+export * from './bind-identiy-provider.use-case'

@@ -9,6 +9,7 @@ import { UserLogin } from "../../auth/use-cases";
 import { ILoginAuthFactory } from "../../auth/domain/repository";
 import { LoginUser } from "../../auth/domain/entities";
 import { LOGIN_TYPE } from "../../auth/domain/enum";
+import { LoginRequestPasswordDto } from "../../auth/domain/dtos";
 
 interface Props{
     realmRepository: RealmRepository
@@ -50,9 +51,11 @@ export class UserService implements IUserService {
        }
 
        const loginUser = await new UserLogin(this.loginAuthFactory).execute( {
-           password: credentialWithPassword.value,
-           username: createUserDto.username,
-           grantType: LOGIN_TYPE.PASSWORD
+           grantType: LOGIN_TYPE.PASSWORD,
+           data: new LoginRequestPasswordDto({
+               password: credentialWithPassword.value,
+               username: createUserDto.username,
+           })
        } )
        
        return loginUser

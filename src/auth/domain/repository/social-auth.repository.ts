@@ -1,4 +1,4 @@
-import { CreateProviderProps } from "../dtos";
+import { BindIdentityProviderRepositoryDto, CreateProviderProps } from "../dtos";
 import { SocialAccessToken, SocialUserLogin } from "../entities";
 import { GetAccessTokenPropsRepository, GetProfilePropsRepository, GetUrlPropsRepository } from "../interfaces";
 

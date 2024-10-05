@@ -1,35 +1,31 @@
-import { PasswordLoginStrategyProps } from "../../../domain/interfaces";
 import { LoginUser } from "../../../domain/entities";
+import { TokenExchangeLoginStrategyProps } from "../../../domain/interfaces";
 import { LoginAuthStrategy } from "../../../domain/repository";
+import { KeycloakFetch } from "../../../../core/keycloak/keycloak-fetch";
 import { CustomError } from "../../../../core/models";
 import { KeycloakResponsesAdapter } from "../adapters";
-import { KeycloakFetch } from "../../../../core/keycloak/keycloak-fetch";
-import { LoginAuthStrategyDto } from "../../../domain/dtos";
+import { LoginAuthStrategyDto } from "../../../domain/dtos/login/repository/login-auth-strategy.dto";
 import { LOGIN_TYPE } from "../../../domain/enum";
 
-interface LoginProps{
-    username: string
-    password:string
-}
 
-export class PasswordAuthStrategy implements LoginAuthStrategy {
-
+export class TokenExchangeLoginStrategy implements LoginAuthStrategy {
+    
     private readonly _realm: string
     private readonly _keycloackFetchBuilder: KeycloakFetch
 
-    constructor( {realm, keycloakFetch}: PasswordLoginStrategyProps ){
+    constructor( {realm, keycloakFetch}: TokenExchangeLoginStrategyProps ){
         this._realm  = realm
         this._keycloackFetchBuilder  = keycloakFetch
     }
 
-    async login(loginProps: LoginAuthStrategyDto ): Promise<LoginUser> {
-        if(loginProps.grantType != LOGIN_TYPE.PASSWORD ) throw CustomError.internalServer() 
+    async login(loginProps: LoginAuthStrategyDto): Promise<LoginUser> {
+        if(loginProps.grantType != LOGIN_TYPE.TOKEN_EXCHANGE ) throw CustomError.internalServer() 
         try {           
             const params = new URLSearchParams({
-                'scope': 'openid',
-                'grant_type': 'password',
-                'username': loginProps.username,
-                'password': loginProps.password,
+                // 'scope': 'openid',
+                'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
+                'subject_issuer': loginProps.provider,
+                'subject_token': loginProps.token,
             });
 
             const resp = await this._keycloackFetchBuilder
@@ -38,7 +34,7 @@ export class PasswordAuthStrategy implements LoginAuthStrategy {
                     .setPath(`/realms/${this._realm}/protocol/openid-connect/token`)
                     .fetch()
             const data = await resp.json()
-            if(data.error) throw CustomError.badRequest('Usuario y/o contraseña invalidos')
+            if(data.error) throw CustomError.badRequest('El token no es valido')
             return KeycloakResponsesAdapter.toLoginUser(data);
         
         } catch (error) {
@@ -49,4 +45,5 @@ export class PasswordAuthStrategy implements LoginAuthStrategy {
             throw CustomError.internalServer()
         }
     }
+
 }
