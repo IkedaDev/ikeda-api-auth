@@ -1,10 +1,10 @@
 import { Request, Response, Router } from 'express'
 import { check } from 'express-validator'
 import { validateFields } from '../../../core/server/express/middlewares'
-import { keycloakAuth, keycloakRealm, socialAuthFactory, } from '../../../core/bootstrapper/repository'
+import { keycloakAuth, keycloakRealm, socialAuthFactory, loginAuthFactory } from '../../../core/bootstrapper/repository'
 import { AuthController } from '../controller/auth.controller'
 import { validateAccessToken } from '../middlewares'
-import { SOCIAL_AUTH_PROVIDER } from '../../domain/enum'
+import { LOGIN_TYPE, SOCIAL_AUTH_PROVIDER } from '../../domain/enum'
 import { AuthService } from '../../services'
 
 export class AuthRouter {
@@ -13,13 +13,25 @@ export class AuthRouter {
         const router = Router()
 
         const authService = new AuthService({socialAuthFactory,realmRepository: keycloakRealm})
-        const controller = new AuthController( { authRepository: keycloakAuth, socialAuthFactory: socialAuthFactory, authService} )
+        const controller = new AuthController( { 
+            authRepository: keycloakAuth,
+            socialAuthFactory: socialAuthFactory,
+            authService,
+            loginAuthFactory,
+            } )
 
         router.post('/login',[
             check('username','El username es obligatorio').not().isEmpty(),
             check('username','El username debe ser un string').isString(),
             check('password','El password es obligatorio').not().isEmpty(),
             check('password','La contraseña debe tener minimo 6 caracteres').isLength({min:6}),
+            check('grant_type')
+            .custom((value) => {
+                if (!Object.values(LOGIN_TYPE).includes(value)) {
+                    throw new Error(`El grant_type no válido - ${Object.values(LOGIN_TYPE)}` );
+                }
+                return true;
+            }),
             validateFields,
         ], ( req: Request, res: Response ) => controller.login(req, res) )
 

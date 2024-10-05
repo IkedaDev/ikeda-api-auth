@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { body, check } from 'express-validator'
 
-import { keycloakAuth, keycloakRealm, keycloakUser } from '../../../core/bootstrapper/repository'
+import { keycloakRealm, keycloakUser, loginAuthFactory } from '../../../core/bootstrapper/repository'
 import { validateFields } from '../../../core/server/express/middlewares'
 
 import { validateAccessToken } from '../../../auth/presentation/middlewares'
@@ -15,7 +15,7 @@ export class UserRouter {
         const router = Router()
         
 
-        const userService = new UserService({realmRepository: keycloakRealm, userRepository: keycloakUser, authRespotitory: keycloakAuth})
+        const userService = new UserService({realmRepository: keycloakRealm, userRepository: keycloakUser, loginAuthFactory})
         const controller = new UserController({userRepository: keycloakUser, userService})
 
         router.post('/user-info',[

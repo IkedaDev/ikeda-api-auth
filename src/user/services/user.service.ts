@@ -6,25 +6,26 @@ import { UserRepository } from "../domain/repository";
 import { RealmRepository } from "../../realm/domain/infrastructure";
 import { CreateUser } from "../use-cases";
 import { UserLogin } from "../../auth/use-cases";
-import { AuthRepository } from "../../auth/domain/repository";
+import { ILoginAuthFactory } from "../../auth/domain/repository";
 import { LoginUser } from "../../auth/domain/entities";
+import { LOGIN_TYPE } from "../../auth/domain/enum";
 
 interface Props{
     realmRepository: RealmRepository
     userRepository: UserRepository
-    authRespotitory: AuthRepository
+    loginAuthFactory: ILoginAuthFactory
 }
 
 export class UserService implements IUserService {
 
     private readonly userRepository: UserRepository
     private readonly realmRepository: RealmRepository
-    private readonly authRespotitory: AuthRepository
+    private readonly loginAuthFactory: ILoginAuthFactory
     
-    constructor({ realmRepository,userRepository, authRespotitory }:Props){
+    constructor({ realmRepository,userRepository, loginAuthFactory }:Props){
         this.userRepository = userRepository
         this.realmRepository = realmRepository
-        this.authRespotitory = authRespotitory
+        this.loginAuthFactory = loginAuthFactory
     }
 
     async register(createUserDto: CreateUserRequestDto): Promise<string | LoginUser> {
@@ -48,9 +49,10 @@ export class UserService implements IUserService {
         throw CustomError.badRequest('No se ha podido crear al usuario') 
        }
 
-       const loginUser = await new UserLogin(this.authRespotitory).execute( {
+       const loginUser = await new UserLogin(this.loginAuthFactory).execute( {
            password: credentialWithPassword.value,
            username: createUserDto.username,
+           grantType: LOGIN_TYPE.PASSWORD
        } )
        
        return loginUser

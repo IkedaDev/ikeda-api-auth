@@ -2,7 +2,7 @@ import { Response, Request } from 'express'
 
 import { Controller } from '../../../core/server/express/controller';
 import * as Dto from '../../domain/dtos';
-import { AuthRepository, ISocialAuthFactory } from '../../domain/repository';
+import { AuthRepository, ILoginAuthFactory, ISocialAuthFactory } from '../../domain/repository';
 import * as UseCase from '../../use-cases';
 import { ServerResponse } from '../../../core/interfaces';
 import { AuthControllerProps } from '../../domain/interfaces';
@@ -10,22 +10,23 @@ import { SOCIAL_AUTH_PROVIDER } from 'src/auth/domain/enum';
 import { IAuthService } from 'src/auth/domain/services';
 
 
-
 export class AuthController extends Controller{
     private readonly authRepository: AuthRepository
     private readonly socialAuthFactory: ISocialAuthFactory
     private readonly authService: IAuthService
+    private readonly loginAuthFactory: ILoginAuthFactory
     
-    constructor({ authRepository, socialAuthFactory, authService }: AuthControllerProps){
+    constructor({ authRepository, socialAuthFactory, authService, loginAuthFactory }: AuthControllerProps){
         super()
         this.authRepository = authRepository
         this.socialAuthFactory = socialAuthFactory
         this.authService = authService
+        this.loginAuthFactory = loginAuthFactory
     }
 
     login(req: Request, res: Response){
         const loginDto = new Dto.LoginRequestDto({...req.body})
-        new UseCase.UserLogin(this.authRepository).execute(loginDto)
+        new UseCase.UserLogin(this.loginAuthFactory).execute(loginDto)
         .then((response)=>{
             res.status(200).json({
                 status:true,
